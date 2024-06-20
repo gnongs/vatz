@@ -14,7 +14,7 @@ jobs:
     - name: Check creation date # Step to determine if this is the second week because you have to create a 'Discussion & Milestone' every two weeks
       id: check_week
       run: |
-        WEEK_NUM=`date -d ${{ env.START_DATE }} +%U`
+        WEEK_NUM=`date -d ${{ vars.START_DATE }} +%U`
         THIS_WEEK_NUM=`date +%U`
         DIFF_WEEK_NUM=$( expr $WEEK_NUM - $THIS_WEEK_NUM )
         if [ $(( DIFF_WEEK_NUM % 2)) -eq 0 ]; then
