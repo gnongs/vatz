@@ -73,5 +73,5 @@ jobs:
           Sprint | Issue fulfillment | progress rate(%)
           --: | :--: | :--:
           
-        repository-id: "${{ REPOSITORY_ID }}"
-        category-id: "${{ CATEGORY_ID }}"
+        repository-id: "${{ env.REPOSITORY_ID }}"
+        category-id: "${{ env.CATEGORY_ID }}"
