@@ -19,15 +19,23 @@ jobs:
         DIFF_WEEK_NUM=$( expr $WEEK_NUM - $THIS_WEEK_NUM )
         if [ $(( DIFF_WEEK_NUM % 2)) -eq 0 ]; then
           echo "This is the correct week"
-          echo "::set-output name=run_job::true"
+          echo "is_week=true" >> $GITHUB_OUTPUT
         else
           echo "This is not the correct week"
-          echo "::set-output name=run_job::false"
+          echo "is_week=false" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
+    - name: Get meeting date
+      if: steps.check_week.outputs.is_week == 'true'
+      id: check_meeting_date
+      run: |
+        meeting=`date -d "wed" +"%Y-%m-%d"`
+        echo "meet_date=$meeting" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Get latest discussion number
-      if: steps.check_week.outputs.run_job == 'true'
+      if: steps.check_week.outputs.is_week == 'true'
       id: check_latest_discussion
       run: |
         # GitHub GraphQL API Endpoint
@@ -45,15 +53,7 @@ jobs:
 
         NEXT_NUM=$( expr $LASTEST + 1 )
         
-        echo "::set-output name=dis_num::$NEXT_NUM"
-      shell: bash
-
-    - name: Get meeting date
-      if: steps.check_week.outputs.run_job == 'true'
-      id: check_meeting_date
-      run: |
-        meeting=`date -d "wed" +"%Y-%m-%d"`
-        echo "::set-output name=meet_date::$meeting"
+        echo "dis_num=$NEXT_NUM" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Generate new discussion
@@ -62,8 +62,6 @@ jobs:
       uses: abirismyname/create-discussion@v1.1.0
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPOSITORY_ID: ${{ secrets.REPOSITORY_ID }}
-        CATEGORY_ID: ${{ secrets.CATEGORY_ID }}
       with:
         title: "${{ steps.check_latest_discussion.outputs.dis_num }}. VATZ biweekly meeting at ${{ steps.check_meeting_date.outputs.meet_date }}"
         body: |
@@ -73,5 +71,5 @@ jobs:
           Sprint | Issue fulfillment | progress rate(%)
           --: | :--: | :--:
           
-        repository-id: "${{ env.REPOSITORY_ID }}"
-        category-id: "${{ env.CATEGORY_ID }}"
+        repository-id: "${{ secrets.REPOSITORY_ID }}"
+        category-id: "${{ secrets.CATEGORY_ID }}"
