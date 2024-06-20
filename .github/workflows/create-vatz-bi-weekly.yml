@@ -16,7 +16,8 @@ jobs:
       run: |
         WEEK_NUM=`date -d ${{ vars.START_DATE }} +%U`
         THIS_WEEK_NUM=`date +%U`
-        DIFF_WEEK_NUM=$( expr $WEEK_NUM - $THIS_WEEK_NUM )
+        DIFF_WEEK_NUM=$( expr $THIS_WEEK_NUM - $WEEK_NUM )
+
         if [ $(( DIFF_WEEK_NUM % 2)) -eq 0 ]; then
           echo "This is the correct week"
           echo "is_week=true" >> $GITHUB_OUTPUT
